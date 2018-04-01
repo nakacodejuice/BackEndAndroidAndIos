@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+import BackEnd
+from BackEnd.views import token
+from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'^token/', BackEnd.views.token, name='token'),
+    url(r'^api/Account/Register', BackEnd.views.token, name='token'),
 ]
