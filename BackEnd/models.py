@@ -15,7 +15,7 @@ class session(models.Model):
 
 class MobileUsers(models.Model):
     login = models.CharField(max_length=36,primary_key=True)
-    status = models.CharField(max_length=15)
+    status = models.CharField(max_length=15,default='')
     password = models.CharField(max_length=36)
     uiduser = models.CharField(max_length=36, primary_key=True)
     datetimecreate = models.DateTimeField('date created', auto_now_add=True)
@@ -23,7 +23,11 @@ class MobileUsers(models.Model):
         return self.login+'-'+str(self.uiduser)
 
 class GasUsers(models.Model):
-    account = models.CharField(max_length=10,primary_key=True)
+    account = models.IntegerField(max_length=10,primary_key=True)
+    lastname = models.CharField(max_length=50)
     uiduser = models.CharField(max_length=36)
     def __str__(self):
-        return self.account+'/'+str(self.uiduser)
+        if(self.uiduser==""):
+            return self.account
+        else:
+            return self.account + '/' + str(self.uiduser)

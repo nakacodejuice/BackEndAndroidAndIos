@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import  timedelta
 import django.utils.timezone as t
 from django.core.exceptions import ObjectDoesNotExist
-from BackEnd.models import session,MobileUsers
+from BackEnd.models import session,MobileUsers,GasUsers
 import json
 import time
 import uuid
@@ -39,9 +39,36 @@ def token(request):
 def register(request):
     if request.method == 'POST':
         received_json_data = json.loads(request.body.decode("utf-8-sig"))
-        received_json_data['account']
-        received_json_data['lastName']
-        received_json_data['password']
-        received_json_data['confirmPassword']
-        received_json_data['email']
-        received_json_data['mobilePhone']
+        account = received_json_data['account']
+        lastname = received_json_data['lastName']
+        password = received_json_data['password']
+        confirmPassword = received_json_data['confirmPassword']
+        email = received_json_data['email']
+        mobilePhone = received_json_data['mobilePhone']
+        code = 0
+        NotExist=False
+        try:
+            GasUsersQR = GasUsers.objects.get(account=int(account),lastname=lastname)
+
+        except ObjectDoesNotExist:
+            NotExist = True
+            mess="Связка указанного лицевого счета и фамилии не найдена"
+        except Exception:
+            NotExist = True
+            mess = "Ошибка!Некорректно введены данные"
+        if(password!=confirmPassword):
+            mess = "Пароль и подтверждение пароля не совпадают"
+        elif(GasUsersQR.uiduser!=""):
+            mess = "Указанный номер лицевого счета уже зарегистрирован. Если Вы забыли пароль - пройдите процедуру восстановления пароля"
+        elif(NotExist==False):
+            code=1
+            mess="Регистрация произведена"
+            userid = str(uuid.uuid4())
+            odjMobileUser = MobileUsers(login=account,password=password,uiduser=userid)
+            odjMobileUser.save()
+            GasUsersQR.uiduser = userid
+            GasUsersQR.save()
+        resp = {"code" : code,"message" : mess }
+        return HttpResponse(json.dumps(resp, ensure_ascii=False), content_type="application/json")
+    else:
+        return HttpResponse(status=403)
