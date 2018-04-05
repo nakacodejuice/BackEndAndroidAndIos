@@ -14,12 +14,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
 import BackEnd
 from BackEnd.views import token
 from django.conf.urls import url
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    url('admin/', admin.site.urls),
     url(r'^token/', BackEnd.views.token, name='token'),
-    url(r'^api/Account/Register', BackEnd.views.token, name='token'),
+    url(r'^api/Account/Register', BackEnd.views.register, name='register'),
+    url(r'^api/account', BackEnd.views.account, name='account'),
+    url(r'^api/account/password/forgot/:*', BackEnd.views.forgot, name='forgot'),
+    url(r'^api/account/device', BackEnd.views.device, name='device'),
+    url(r'^api/Сhar', BackEnd.views.Сhar, name='Сhar'),
+    url(r'^api/CounterCharge', BackEnd.views.MetersCharge, name='MetersCharge'),
+    url(r'^api/Counter', BackEnd.views.Meters, name='Meters'),
+    url(r'^api/Pay', BackEnd.views.Pay, name='Pay'),
+    url(r'^api/Saldo', BackEnd.views.Saldo, name='Saldo'),
+    url(r'^api/saldo/current', BackEnd.views.SaldoCurrent, name='SaldoCurrent'),
+    url(r'^api/saldo/current:*', BackEnd.views.SaldoCurrentserviceId, name='SaldoCurrentserviceId'),
+    url(r'^api/saldo/notification', BackEnd.views.notification, name='notification'),
+    url(r'^api/saldo/notification/new', BackEnd.views.notificationnew, name='notificationnew'),
+    url(r'^api/saldo/notification:*', BackEnd.views.notificationid, name='notificationid'),
 ]
