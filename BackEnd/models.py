@@ -25,6 +25,32 @@ class MobileUsers(models.Model):
     def __str__(self):
         return self.login+'-'+str(self.uiduser)
 
+class News(models.Model):
+    subj = models.CharField(max_length=50)
+    date = models.DateTimeField()
+    news= models.TextField()
+    auth = models.BooleanField()
+    def __str__(self):
+        return self.date+'/'+str(self.subj)
+    class Meta:
+        ordering = ["-date"]
+
+class Uchastok(models.Model):
+    parentid = models.IntegerField()
+    name = models.CharField(max_length=50)
+    text= models.TextField()
+    def __str__(self):
+        return self.name
+
+class tarifs(models.Model):
+    tariff = models.CharField(max_length=50)
+    dateStart = models.DateTimeField()
+    dateEnd= models.DateTimeField()
+    def __str__(self):
+        return self.dateStart+'/'+str(self.dateEnd)
+    class Meta:
+        ordering = ["-dateStart"]
+
 class GasUsers(models.Model):
     account = models.IntegerField(primary_key=True)
     lastname = models.CharField(max_length=50)

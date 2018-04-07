@@ -2,10 +2,10 @@
 # from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from datetime import  timedelta
+from datetime import timedelta
 import django.utils.timezone as t
 from django.core.exceptions import ObjectDoesNotExist
-from BackEnd.models import session,MobileUsers,GasUsers
+from BackEnd.models import session,MobileUsers,GasUsers,News,tarifs,Uchastok
 import requests
 import json
 import time
@@ -227,7 +227,7 @@ def notification(request):
         except Exception:
             return HttpResponse(status=403)
     elif request.method == 'POST':
-        # Всегда нет
+        # Всегда нет на удаление
         return HttpResponse(json.dumps({"code":"0", "message":"Сообщение не удалено!"}, ensure_ascii=False), content_type="application/json")
 
 @csrf_exempt
@@ -257,13 +257,184 @@ def notificationid(request):
 
     return HttpResponse(status=403)
 
+
+@csrf_exempt
+def news(request):
+    token = request.META['Authorization: Bearer']
+    objGasUsers= None
+    try:
+        objsession = session.objects.get(access_token=token)
+        if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
+            objGasUsers = GasUsers.objects.get(uiduser=objsession.uiduser)
+    except Exception:
+        objGasUsers = None
+    if(objGasUsers!=None):
+        resp = GetNews(True)
+    else:
+        resp = GetNews(False)
+    return HttpResponse(json.dumps(resp, ensure_ascii=False), content_type="application/json")
+
+@csrf_exempt
+def newsid(request):
+    token = request.META['Authorization: Bearer']
+    Id = 1
+    objGasUsers= None
+    try:
+        objsession = session.objects.get(access_token=token)
+        if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
+            objGasUsers = GasUsers.objects.get(uiduser=objsession.uiduser)
+    except Exception:
+        objGasUsers = None
+    if(objGasUsers!=None):
+        resp = GetNewsById(True)
+    else:
+        resp = GetNewsById(False)
+    return HttpResponse(json.dumps(resp, ensure_ascii=False), content_type="application/json")
+
+@csrf_exempt
+def tariffdate(request):
+    d = t.now()
+    tarifsres = tarifs.objects.filter(dateStart=d)
+    if tarifsres.count()>0:
+        tarifstring = tarifsres[0].tariff
+    else:
+        tarifstring = ""
+    return HttpResponse(json.dumps({"tariff":tarifstring}, ensure_ascii=False), content_type="application/json")
+
+@csrf_exempt
+def tarifflist(request):
+    tarifsres = tarifs.objects.all()
+    list =[]
+    for tarif in tarifsres:
+        list.append({"dateStart":tarif.dateStart.strftime("%d.%m.%Y"),"dateEnd":tarif.dateEnd.strftime("%d.%m.%Y")})
+    return HttpResponse(json.dumps(list, ensure_ascii=False), content_type="application/json")
+
+@csrf_exempt
+def uchastoklist(request):
+    Uchres = Uchastok.objects.all()
+    punkts = []
+    for uch in Uchres:
+        punkts.append({"id":uch.id,
+                       "parentId":uch.parentid,
+                       "name":uch.name,
+                       "text":uch.text})
+    return HttpResponse(json.dumps({"date":t.now().strftime("%d.%m.%Y"),"punkts":punkts}, ensure_ascii=False), content_type="application/json")
+
+@csrf_exempt
+def uchastokById(request):
+    id=1
+    try:
+        Uchres = Uchastok.objects.get(id=id)
+        SubUchs = Uchastok.objects.filter(parentid=id)
+        punkts = []
+        for SubUch in SubUchs:
+            punkts.append({"id":SubUch.id,
+                           "name":SubUch.name
+                           })
+        res = {
+            "id": Uchres.id,
+            "parentId": Uchres.parentid,
+            "name": Uchres.name,
+            "text": Uchres.text,
+            "punkts": punkts
+        }
+        return HttpResponse(json.dumps(res, ensure_ascii=False),content_type="application/json")
+
+    except Exception:
+        return HttpResponse(status=404)
+
+@csrf_exempt
+def delivery(request):
+    Id = 1
+    objGasUsers = None
+    token = request.META['Authorization: Bearer']
+    if request.method == 'GET':
+        try:
+            objsession = session.objects.get(access_token=token)
+            if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
+                objGasUsers = GasUsers.objects.get(uiduser=objsession.uiduser)
+        except Exception:
+            objGasUsers = None
+        if (objGasUsers != None):
+            resp = SendRequestTrains(("Mobile_deliveryget",{"account":objGasUsers.account},True))
+            resp = resp['type']
+        else:
+            resp = HttpResponse(status=403)
+    elif request.method == 'POST':
+        type = request.body.decode("utf-8-sig")
+        try:
+            objsession = session.objects.get(access_token=token)
+            if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
+                objGasUsers = GasUsers.objects.get(uiduser=objsession.uiduser)
+        except Exception:
+            objGasUsers = None
+        if (objGasUsers != None):
+            resp = SendRequestTrains(("Mobile_deliveryset",{"account":objGasUsers.account,"type":type},True))
+            result = resp['result']
+            if(result=="OK"):
+                resp = HttpResponse(status=200)
+            else:
+                resp = HttpResponse(status=500)
+        else:
+            resp = HttpResponse(status=403)
+    return resp
+
+@csrf_exempt
+def ReadingsReceived(request):
+    token = request.META['Authorization: Bearer']
+    try:
+        objsession = session.objects.get(access_token=token)
+        if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
+            objGasUsers = GasUsers.objects.get(uiduser=objsession.uiduser)
+    except Exception:
+        objGasUsers = None
+    if (objGasUsers != None):
+        resp = SendRequestTrains(("Mobile_ReadingsReceived", {"account": objGasUsers.account}))
+    else:
+        resp = HttpResponse(status=403)
+    return resp
+
+@csrf_exempt
+def ReadingsAccepted(request):
+    token = request.META['Authorization: Bearer']
+    try:
+        objsession = session.objects.get(access_token=token)
+        if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
+            objGasUsers = GasUsers.objects.get(uiduser=objsession.uiduser)
+    except Exception:
+        objGasUsers = None
+    if (objGasUsers != None):
+        resp = SendRequestTrains(("Mobile_ReadingsAccepted", {"account": objGasUsers.account}))
+    else:
+        resp = HttpResponse(status=403)
+    return resp
+
+@csrf_exempt
+def SetReadings(request):
+    token = request.META['Authorization: Bearer']
+    if request.method == 'POST':
+        received_json_data = json.loads(request.body.decode("utf-8-sig"))
+        try:
+            objsession = session.objects.get(access_token=token)
+            if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
+                objGasUsers = GasUsers.objects.get(uiduser=objsession.uiduser)
+        except Exception:
+            objGasUsers = None
+        if (objGasUsers != None):
+            resp = SendRequestTrains(("Mobile_SetReadings", {"account": objGasUsers.account,"sn":received_json_data['sn'],"value":received_json_data['value']}))
+        else:
+            resp = HttpResponse(status=403)
+    else:
+        resp = HttpResponse(status=404)
+    return resp
+
 #-----------------------------------------------------
 def SendRequestTrains(id,params,retjson=False):
     data={"id":id,"params":params}
     requestTrain = {
                 "event": "SetNewRequest",
                 "data": data
-    }
+                 }
     headers = {'content-type': 'application/json'}
     res = requests.post(UrlTrains + 'rest/', json=requestTrain, headers=headers)
     received_json_data = json.loads(res.content.decode("utf-8-sig"))
@@ -272,6 +443,28 @@ def SendRequestTrains(id,params,retjson=False):
     else:
         resp = received_json_data
     return resp
+
+def Question(request):
+
+    return HttpResponse(status=20000)
+
+def Inform(request):
+
+    return "Тестовое информирование"
+
+def GetNews(auth):
+    NewRes = News.objects.filter(auth=auth)
+    newslist = []
+    for New in NewRes:
+        newslist.append({"id": New.id, "subj": New.subj, "date": New.date.strftime("%d.%m.%Y")})
+    return {"code": 1, "news": newslist}
+
+def GetNewsById(auth,id):
+    try:
+        NewRes = News.objects.get(auth=auth,id=id)
+        return {"code": 1, "id": id, "subj": NewRes.subj, "date": NewRes.date,"news": NewRes.news }
+    except Exception:
+        return {"code": 1, "id": id, "subj": "", "date": "","news": ""}
 
 
 
