@@ -21,7 +21,7 @@ def token(request):
         uid = str(uuid.uuid4())
         r = MobileUsers.objects.filter(password=password,login=username)
         if r.count()!=0:
-            uiduser = r[0]
+            uiduser = r[0].uiduser
             dbobjsession = session(access_token=uid, uiduser=uiduser)
             dbobjsession.save()
             responsetext = \
@@ -78,7 +78,7 @@ def register(request):
 @csrf_exempt
 def account(request):
     if request.method == 'GET':
-        token = request.META['Authorization: Bearer']
+        token = request.META['HTTP_AUTHORIZATION']
         try:
             objsession = session.objects.get(access_token=token)
             if(objsession.datetimecreate>=t.now()-timedelta(seconds=objsession.expires_in)):
