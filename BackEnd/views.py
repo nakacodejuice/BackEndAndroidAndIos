@@ -201,9 +201,8 @@ def SaldoCurrent(request):
     return HttpResponse(status=403)
 
 @csrf_exempt
-def SaldoCurrentServiceId(request):
+def SaldoCurrentServiceId(request,ServiceId=0):
     token = request.META['Authorization: Bearer']
-    ServiceId='01'
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -244,9 +243,8 @@ def notificationnew(request):
     return HttpResponse(status=403)
 
 @csrf_exempt
-def notificationid(request):
+def notificationid(request,Id):
     token = request.META['Authorization: Bearer']
-    Id='01'
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -275,9 +273,8 @@ def news(request):
     return HttpResponse(json.dumps(resp, ensure_ascii=False), content_type="application/json")
 
 @csrf_exempt
-def newsid(request):
+def newsid(request,Id):
     token = request.META['Authorization: Bearer']
-    Id = 1
     objGasUsers= None
     try:
         objsession = session.objects.get(access_token=token)
@@ -321,8 +318,7 @@ def uchastoklist(request):
     return HttpResponse(json.dumps({"date":t.now().strftime("%d.%m.%Y"),"punkts":punkts}, ensure_ascii=False), content_type="application/json")
 
 @csrf_exempt
-def uchastokById(request):
-    id=1
+def uchastokById(request,id=0):
     try:
         Uchres = Uchastok.objects.get(id=id)
         SubUchs = Uchastok.objects.filter(parentid=id)

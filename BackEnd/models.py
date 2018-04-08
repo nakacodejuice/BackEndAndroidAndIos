@@ -36,11 +36,11 @@ class News(models.Model):
         ordering = ["-date"]
 
 class Uchastok(models.Model):
-    parentid = models.IntegerField()
+    parentid = models.IntegerField(default=0)
     name = models.CharField(max_length=50)
     text= models.TextField()
     def __str__(self):
-        return self.name
+        return str(self.id) + "-"+self.name
 
 class tarifs(models.Model):
     tariff = models.CharField(max_length=50)
@@ -60,4 +60,4 @@ class GasUsers(models.Model):
         if(self.uiduser==""):
             return self.account
         else:
-            return self.account + '/' + str(self.uiduser)
+            return str(self.account) + '/' + str(self.uiduser)
