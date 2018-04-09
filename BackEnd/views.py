@@ -66,7 +66,7 @@ def register(request):
             code=1
             mess="Регистрация произведена"
             userid = str(uuid.uuid4())
-            odjMobileUser = MobileUsers(login=account,password=password,uiduser=userid, mobilePhone= mobilePhone, email= email)
+            odjMobileUser = MobileUsers(login=account,password=password,uiduser=userid, mobilePhone= mobilePhone, email= email, inform=0)
             odjMobileUser.save()
             GasUsersQR.uiduser = userid
             GasUsersQR.save()

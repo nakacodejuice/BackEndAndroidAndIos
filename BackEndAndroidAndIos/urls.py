@@ -19,7 +19,7 @@ from BackEnd.views import token
 from django.conf.urls import url
 urlpatterns = [
     url('admin/', admin.site.urls),
-    url(r'^token/', BackEnd.views.token, name='token'),
+    url(r'^token', BackEnd.views.token, name='token'),
     url(r'^api/Account/Register', BackEnd.views.register, name='register'),
     url(r'^api/account', BackEnd.views.account, name='account'),
     url(r'^api/account/password/forgot/:*', BackEnd.views.forgot, name='forgot'),

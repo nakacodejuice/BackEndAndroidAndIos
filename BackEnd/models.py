@@ -55,9 +55,9 @@ class GasUsers(models.Model):
     account = models.IntegerField(primary_key=True)
     lastname = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
-    uiduser = models.CharField(max_length=36)
+    uiduser = models.CharField(max_length=36,blank=True)
     def __str__(self):
         if(self.uiduser==""):
-            return self.account
+            return str(self.account)
         else:
             return str(self.account) + '/' + str(self.uiduser)
