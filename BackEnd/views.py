@@ -93,11 +93,12 @@ def account(request):
                       "inform": objMobileUser.inform
                     }
                 resp = HttpResponse(json.dumps(response, ensure_ascii=False), content_type="application/json")
-
+            else:
+                resp = HttpResponse(status=403)
         except Exception:
             resp = HttpResponse(status=403)
     elif request.method == 'POST':
-        token = request.META['Authorization: Bearer']
+        token = request.META['HTTP_AUTHORIZATION']
         try:
             objsession = session.objects.get(access_token=token)
             received_json_data = json.loads(request.body.decode("utf-8-sig"))
@@ -122,7 +123,7 @@ def device(request):
 
 @csrf_exempt
 def Сhar(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -135,7 +136,7 @@ def Сhar(request):
 
 @csrf_exempt
 def MetersCharge(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -149,7 +150,7 @@ def MetersCharge(request):
 
 @csrf_exempt
 def Meters(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -162,7 +163,7 @@ def Meters(request):
 
 @csrf_exempt
 def Pay(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -175,7 +176,7 @@ def Pay(request):
 
 @csrf_exempt
 def Saldo(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -188,7 +189,7 @@ def Saldo(request):
 
 @csrf_exempt
 def SaldoCurrent(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -202,7 +203,7 @@ def SaldoCurrent(request):
 
 @csrf_exempt
 def SaldoCurrentServiceId(request,ServiceId=0):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -216,7 +217,7 @@ def SaldoCurrentServiceId(request,ServiceId=0):
 
 @csrf_exempt
 def notification(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     if request.method == 'GET':
         try:
             objsession = session.objects.get(access_token=token)
@@ -231,7 +232,7 @@ def notification(request):
 
 @csrf_exempt
 def notificationnew(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -244,7 +245,7 @@ def notificationnew(request):
 
 @csrf_exempt
 def notificationid(request,Id):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -258,7 +259,7 @@ def notificationid(request,Id):
 
 @csrf_exempt
 def news(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     objGasUsers= None
     try:
         objsession = session.objects.get(access_token=token)
@@ -274,7 +275,7 @@ def news(request):
 
 @csrf_exempt
 def newsid(request,Id):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     objGasUsers= None
     try:
         objsession = session.objects.get(access_token=token)
@@ -343,7 +344,7 @@ def uchastokById(request,id=0):
 def delivery(request):
     Id = 1
     objGasUsers = None
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     if request.method == 'GET':
         try:
             objsession = session.objects.get(access_token=token)
@@ -377,7 +378,7 @@ def delivery(request):
 
 @csrf_exempt
 def ReadingsReceived(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -392,7 +393,7 @@ def ReadingsReceived(request):
 
 @csrf_exempt
 def ReadingsAccepted(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     try:
         objsession = session.objects.get(access_token=token)
         if (objsession.datetimecreate >= t.now() - timedelta(seconds=objsession.expires_in)):
@@ -407,7 +408,7 @@ def ReadingsAccepted(request):
 
 @csrf_exempt
 def SetReadings(request):
-    token = request.META['Authorization: Bearer']
+    token = request.META['HTTP_AUTHORIZATION']
     if request.method == 'POST':
         received_json_data = json.loads(request.body.decode("utf-8-sig"))
         try:
