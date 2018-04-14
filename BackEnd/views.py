@@ -433,7 +433,7 @@ def SendRequestTrains(id,params,retjson=False):
                 "data": data
                  }
     headers = {'content-type': 'application/json'}
-    res = requests.post(UrlTrains + 'rest/', json=requestTrain, headers=headers)
+    res = requests.post(UrlTrains + 'rest/', json=requestTrain, headers=headers,auth=('root', '95174837my'))
     received_json_data = json.loads(res.content.decode("utf-8-sig"))
     if(retjson==False):
         resp = HttpResponse(json.dumps(received_json_data, ensure_ascii=False), content_type="application/json")
